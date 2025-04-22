@@ -17,6 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 
+app.use("", (req, res)=>{
+  res.json({server : "success"})
+})
 app.use(`/api/${APP_VERSION}`, routes);
 
 app.use(errorHandler);
