@@ -69,7 +69,7 @@ export default function Login() {
     <div className="flex min-h-screen">
       {/* Left side - Login Form */}
       <div className="hidden lg:block lg:w-1/2 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100 opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100 opacity-0"></div>
         <Image
           src="https://images.pexels.com/photos/235986/pexels-photo-235986.jpeg?auto=compress&cs=tinysrgb&w=600"
           alt="Login background"

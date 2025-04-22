@@ -92,7 +92,7 @@ export default function Register() {
           </p>
           <div className="relative h-64 md:h-80 w-full rounded-xl overflow-hidden shadow-2xl mb-8">
             <Image
-              src="/placeholder.svg?height=600&width=800"
+              src="https://images.pexels.com/photos/235986/pexels-photo-235986.jpeg?auto=compress&cs=tinysrgb&w=600"
               alt="People collaborating"
               fill
               className="object-cover"
@@ -104,7 +104,7 @@ export default function Register() {
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-indigo-600 overflow-hidden">
                   <Image
-                    src={`/placeholder.svg?height=40&width=40&text=User${i}`}
+                    src={`https://images.pexels.com/photos/235986/pexels-photo-235986.jpeg?auto=compress&cs=tinysrgb&w=600`}
                     alt={`User ${i}`}
                     width={40}
                     height={40}
