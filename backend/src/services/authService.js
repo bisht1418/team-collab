@@ -3,7 +3,11 @@ const { generateAccessToken, generateRefreshToken } = require("../utils/tokenUti
 
 exports.register = async ({ email, password }) => {
   const existingUser = await User.findOne({ email });
-  if (existingUser) throw new Error("Email already exists");
+  if (existingUser) {
+    const error = new Error("Email already exists");
+    error.statusCode = 400;
+    throw error;
+  }
 
   const user = await User.create({ email, password });
   return { email: user.email };
@@ -12,7 +16,9 @@ exports.register = async ({ email, password }) => {
 exports.login = async ({ email, password }) => {
   const user = await User.findOne({ email });
   if (!user || !(await user.comparePassword(password))) {
-    throw new Error("Invalid credentials");
+    const error = new Error("Invalid credentials");
+    error.statusCode = 401;
+    throw error;
   }
 
   const accessToken = generateAccessToken(user._id);
@@ -21,13 +27,4 @@ exports.login = async ({ email, password }) => {
   await user.save();
 
   return { accessToken, refreshToken };
-};
-
-exports.refresh = async (token) => {
-  const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-  const user = await User.findById(decoded.id);
-  if (!user || user.refreshToken !== token) throw new Error("Invalid refresh token");
-
-  const newAccessToken = generateAccessToken(user._id);
-  return { accessToken: newAccessToken };
 };
