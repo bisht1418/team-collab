@@ -48,7 +48,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="md:w-1/2 mt-10 md:mt-0">
-            <div className="bg-white rounded-lg shadow-xl p-6 text-gray-800">
+            <div className="bg-white rounded-lg shadow-xl p-6 text-gray-800 rounded-md">
               <div className="flex items-center mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
@@ -263,6 +263,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
     </div>
   )
 }
