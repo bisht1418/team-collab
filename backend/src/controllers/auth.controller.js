@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { JWT_SECRET, JWT_REFRESH_EXPIRATION_DAYS, JWT_ACCESS_EXPIRATION_MINUTES } = require('../config/environment');
 
 /**
  * Generate tokens (access and refresh)
@@ -9,9 +10,9 @@ const { tokenTypes } = require('../config/tokens');
  * @returns {Object}
  */
 const generateTokens = (user) => {
-  const accessTokenExpires = process.env.JWT_ACCESS_EXPIRATION_MINUTES || '30m';
-  const refreshTokenExpires = process.env.JWT_REFRESH_EXPIRATION_DAYS || '30d';
-  const secret = process.env.JWT_SECRET;
+  const accessTokenExpires = JWT_ACCESS_EXPIRATION_MINUTES
+  const refreshTokenExpires = JWT_REFRESH_EXPIRATION_DAYS
+  const secret = JWT_SECRET;
 
   const accessToken = jwt.sign(
     {
@@ -154,7 +155,7 @@ const refreshTokens = async (req, res, next) => {
     // Verify refresh token
     let tokenPayload;
     try {
-      tokenPayload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      tokenPayload = jwt.verify(refreshToken, JWT_SECRET);
     } catch (error) {
       throw new ApiError(401, 'Invalid refresh token');
     }

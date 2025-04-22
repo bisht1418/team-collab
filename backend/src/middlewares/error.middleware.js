@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const ApiError = require('../utils/ApiError');
+const { NODE_ENV } = require('../config/environment');
 
 /**
  * Error converter middleware
@@ -39,7 +40,7 @@ const errorHandler = (err, req, res, next) => {
     message: statusCode === 500 && !isOperational 
       ? 'Internal server error' 
       : message,
-    ...(process.env.NODE_ENV === 'development' && { stack }),
+    ...(NODE_ENV === 'development' && { stack }),
   });
 };
 

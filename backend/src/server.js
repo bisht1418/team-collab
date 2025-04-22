@@ -1,8 +1,8 @@
 const app = require('./app');
 const mongoose = require('mongoose');
-const { MONGODB_URI } = require('./config/environment');
+const { MONGODB_URI, PORT } = require('./config/environment');
 
-const port = process.env.PORT || 3000;
+const port = PORT || 3000;
 
 mongoose.connect(MONGODB_URI)
   .then(() => {

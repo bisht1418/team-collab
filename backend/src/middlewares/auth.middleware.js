@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { JWT_SECRET } = require('../config/environment');
 
 /**
  * Auth middleware to authenticate requests
@@ -13,9 +14,8 @@ const { tokenTypes } = require('../config/tokens');
  */
 const auth = async (req, res, next) => {
   try {
-    // Get token from header
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new ApiError(401, 'Authentication required');
     }
@@ -26,10 +26,9 @@ const auth = async (req, res, next) => {
       throw new ApiError(401, 'Authentication required');
     }
 
-    // Verify token
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, JWT_SECRET);
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         throw new ApiError(401, 'Token expired');
@@ -37,18 +36,15 @@ const auth = async (req, res, next) => {
       throw new ApiError(401, 'Invalid token');
     }
 
-    // Check if token type is access
     if (decoded.type !== tokenTypes.ACCESS) {
       throw new ApiError(401, 'Invalid token type');
     }
 
-    // Find user
     const user = await User.findById(decoded.userId);
     if (!user) {
       throw new ApiError(401, 'User not found');
     }
 
-    // Attach user info to request
     req.user = {
       userId: user._id,
       role: user.role,
