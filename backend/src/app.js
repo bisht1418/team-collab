@@ -1,49 +1,43 @@
-const cors = require('cors');
-const http = require("http");
-const helmet = require('helmet');
-const morgan = require('morgan');
-const routes = require('./routes');
+// src/app.js
+
 const express = require('express');
-const { Server } = require("socket.io");
-const logger = require('./utils/logger');
-const connectDB = require('./db/mongoose');
-const socketHandler = require('./socket/socketHandler');
-const errorHandler = require('./middlewares/errorHandler');
-const { NODE_ENV, PORT, APP_VERSION } = require('./config/environment');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const routes = require('./routes');
+const { errorConverter, errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-socketHandler(io);
-
-connectDB();
 
 app.use(helmet());
-app.use(cors());
+
 app.use(express.json());
-app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-app.use("", (req, res)=>{
-  res.json({server : "success"})
-})
-app.use(`/api/${APP_VERSION}`, routes);
+app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  const error = new Error(`Route ${req.originalUrl} not found`);
-  error.statusCode = 404;
-  next(error);
+app.use(xss());
+app.use(mongoSanitize());
+
+app.use(cors());
+app.options('*', cors());
+
+app.use(compression());
+
+app.use('/api', routes);
+
+app.get('/health', (req, res) => res.status(200).send({ status: 'OK' }));
+
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Resource not found',
+  });
 });
 
-// app.use(errorHandler);
+app.use(errorConverter);
 
-server.listen(PORT, () => {
-  logger.info(`Server running in ${NODE_ENV} mode on port ${PORT}`);
-});
+app.use(errorHandler);
 
 module.exports = app;
