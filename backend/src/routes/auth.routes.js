@@ -43,4 +43,13 @@ router.get(
   authController.getCurrentUser
 );
 
+
+// Get all user route
+router.get(
+  '/all', 
+  auth, 
+  authController.getAllUser
+);
+
+
 module.exports = router;

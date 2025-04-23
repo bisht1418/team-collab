@@ -225,9 +225,9 @@ const logout = async (req, res, next) => {
 const getCurrentUser = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    
+
     const user = await User.findById(userId).select('-password -refreshToken');
-    
+
     if (!user) {
       throw new ApiError(404, 'User not found');
     }
@@ -243,10 +243,30 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
+const getAllUser = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+
+    const users = await User.find({ _id: { $ne: userId } })
+      .select('-password -refreshToken')
+      .lean();
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        users,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   refreshTokens,
   logout,
   getCurrentUser,
+  getAllUser
 };

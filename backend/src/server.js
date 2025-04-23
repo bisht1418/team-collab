@@ -1,4 +1,4 @@
-const app = require('./app');
+const { server } = require('./app'); 
 const mongoose = require('mongoose');
 const { MONGODB_URI, PORT } = require('./config/environment');
 
@@ -6,36 +6,19 @@ const port = PORT || 3000;
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
-    console.log(`✅ Successfully connected to MongoDB at ${MONGODB_URI}`);
-
-    const server = app.listen(port, () => {
+    console.log(`✅ MongoDB connected`);
+    server.listen(port, () => {
       console.log(`🚀 Server running on port ${port}`);
     });
-
     const unexpectedErrorHandler = (error) => {
       console.error('❌ Unexpected error:', error);
-
-      if (server) {
-        server.close(() => {
-          console.log('🛑 Server closed');
-          process.exit(1);
-        });
-      } else {
-        process.exit(1);
-      }
+      if (server) server.close(() => process.exit(1));
     };
-
     process.on('uncaughtException', unexpectedErrorHandler);
     process.on('unhandledRejection', unexpectedErrorHandler);
-
     process.on('SIGTERM', () => {
       console.log('🔄 SIGTERM received');
-      if (server) {
-        server.close(() => {
-          console.log('🛑 Server closed');
-          process.exit(0);
-        });
-      }
+      server.close(() => process.exit(0));
     });
   })
   .catch((error) => {

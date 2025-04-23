@@ -1,54 +1,59 @@
 // controllers/chatController.js
 const { Chat, Message } = require('../models/chat.model');
-const User = require('../models/user.model'); // Assuming you have a User model
+const User = require('../models/user.model');
 
 exports.accessChat = async (req, res) => {
   const { userId } = req.body;
-  
   if (!userId) {
     return res.status(400).send({ message: "UserId param not sent with request" });
   }
 
+  if (userId === req.user.userId.toString()) {
+    return res.status(400).send({ message: "Cannot create chat with yourself" });
+  }
+
   try {
-    let isChat = await Chat.find({
+    const otherUser = await User.findById(userId).select('name');
+
+    if (!otherUser) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    let existingChat = await Chat.findOne({
       isGroupChat: false,
-      $and: [
-        { users: { $elemMatch: { $eq: req.user._id } } },
-        { users: { $elemMatch: { $eq: userId } } },
-      ],
+      users: { $all: [req.user.userId, userId] }
     })
+      .sort({ createdAt: -1 })
       .populate("users", "-password")
       .populate("latestMessage");
-    
-    isChat = await User.populate(isChat, {
-      path: "latestMessage.sender",
-      select: "name email",
-    });
 
-    if (isChat.length > 0) {
-      res.send(isChat[0]);
-    } else {
-      const chatData = {
-        chatName: "sender",
-        isGroupChat: false,
-        users: [req.user._id, userId],
-      };
 
-      const createdChat = await Chat.create(chatData);
-      const fullChat = await Chat.findOne({ _id: createdChat._id }).populate(
-        "users",
-        "-password"
-      );
-      res.status(200).send(fullChat);
+    if (existingChat) {
+      return res.send(existingChat);
     }
+
+    const chatData = {
+      chatName: `${req.user.name} & ${otherUser.name}`,
+      isGroupChat: false,
+      users: [req.user.userId, userId],
+    };
+
+    const createdChat = await Chat.create(chatData);
+
+    const fullChat = await Chat.findOne({ _id: createdChat._id })
+      .populate("users", "-password");
+
+    res.status(200).send(fullChat);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(500).send({
+      message: error.message || "Server error occurred"
+    });
   }
 };
 
 exports.fetchChats = async (req, res) => {
   try {
-    const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+    const chats = await Chat.find({ users: { $elemMatch: { $eq: req.user.userId } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage")

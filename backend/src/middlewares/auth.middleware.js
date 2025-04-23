@@ -48,6 +48,7 @@ const auth = async (req, res, next) => {
     req.user = {
       userId: user._id,
       role: user.role,
+      name: user.name
     };
 
     next();
