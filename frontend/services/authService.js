@@ -45,6 +45,20 @@ const authService = {
         store.dispatch(logoutAction());
         return { success: true };
     },
+
+    getallUsers: async (token) => {
+        try {
+            const response = await baseService.get("/auth/all", {
+                headers: {
+                    Authorization: `Bearer ${token}` 
+                }
+            });
+            const { status, data } = response.data;
+            return { success: true, status, data };
+        } catch (error) {
+            return handleError(error);
+        }
+    }
 };
 
 export default authService;

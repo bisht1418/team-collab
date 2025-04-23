@@ -1,97 +1,36 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search } from "lucide-react"
+import { useEffect, useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import authService from "services/authService";
+import { useSelector } from "react-redux";
+import chatService from "services/chatService";
 
 export function MessageList() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const token = useSelector((state) => state.auth.token);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allInvitedUser, setAllInvitedUser] = useState([]);
 
-  const conversations = [
-    {
-      id: 1,
-      name: "Rucas Royal",
-      message: "Is this jacket waterproof and warm?",
-      time: "01:09 am",
-      unread: true,
-      avatar: "/placeholder.svg?height=40&width=40&text=RR",
-    },
-    {
-      id: 2,
-      name: "Leslie Alexander",
-      message: "Do you have any new arrivals in medium size?",
-      time: "01:08 pm",
-      unread: true,
-      avatar: "/placeholder.svg?height=40&width=40&text=LA",
-    },
-    {
-      id: 3,
-      name: "Floyd Miles",
-      message: "I need a pair of comfortable jeans for everyday wear.",
-      time: "06:32 pm",
-      unread: true,
-      avatar: "/placeholder.svg?height=40&width=40&text=FM",
-    },
-    {
-      id: 4,
-      name: "Guy Hawkins",
-      message: "I'm attending a wedding soon. Do you have formal wear?",
-      time: "10:32 pm",
-      unread: true,
-      avatar: "/placeholder.svg?height=40&width=40&text=GH",
-    },
-    {
-      id: 5,
-      name: "Wade Warren",
-      message: "What are your best-selling accessories this season?",
-      time: "Yesterday",
-      unread: true,
-      avatar: "/placeholder.svg?height=40&width=40&text=WW",
-    },
-    {
-      id: 6,
-      name: "Kathryn Murphy",
-      message: "I'm looking for a cozy sweater. What do you recommend?",
-      time: "Yesterday",
-      unread: false,
-      avatar: "/placeholder.svg?height=40&width=40&text=KM",
-    },
-    {
-      id: 7,
-      name: "Cody Fisher",
-      message: "Can you help me find a stylish hat for summer?",
-      time: "Yesterday",
-      unread: false,
-      avatar: "/placeholder.svg?height=40&width=40&text=CF",
-    },
-    {
-      id: 8,
-      name: "Esther Howard",
-      message: "I need a pair of formal shoes for a business meeting.",
-      time: "2 days ago",
-      unread: false,
-      avatar: "/placeholder.svg?height=40&width=40&text=EH",
-    },
-    {
-      id: 9,
-      name: "Ronald Richards",
-      message: "I'm looking for a versatile jacket for travel.",
-      time: "3 days ago",
-      unread: false,
-      avatar: "/placeholder.svg?height=40&width=40&text=RR",
-    },
-    {
-      id: 10,
-      name: "Jerome Bell",
-      message: "Do you offer international shipping?",
-      time: "4 days ago",
-      unread: false,
-      avatar: "/placeholder.svg?height=40&width=40&text=JB",
-    },
-  ]
+  const filteredConversations = useMemo(() => {
+    return allInvitedUser.filter((conversation) =>
+      conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [allInvitedUser, searchQuery]);
 
-  const filteredConversations = conversations.filter((conversation) =>
-    conversation.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  useEffect(() => {
+    const getALlUserData = async () => {
+      const responseData = await authService.getallUsers(token);
+      console.log("responseData", responseData);
+      setAllInvitedUser(responseData?.data?.users || []);
+    };
+
+    getALlUserData();
+  }, []);
+
+  const handleViewConverstion = async (userId) => {
+    const responseData = await chatService.accessChat(userId, token);
+    console.log("responseData", responseData);
+  };
 
   return (
     <div className="flex w-80 flex-col border-r">
@@ -108,12 +47,11 @@ export function MessageList() {
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        {filteredConversations.map((conversation) => (
+        {filteredConversations?.map((conversation) => (
           <div
-            key={conversation.id}
-            className={`flex cursor-pointer items-center gap-3 border-b p-4 hover:bg-muted/50 ${
-              conversation.id === 1 ? "bg-muted" : ""
-            }`}
+            key={conversation._id}
+            onClick={() => handleViewConverstion(conversation._id)}
+            className={`flex cursor-pointer items-center gap-3 border-b p-4 bg-gray-100 hover:bg-muted/50 `}
           >
             <div className="relative h-10 w-10 overflow-hidden rounded-full">
               <img
@@ -125,14 +63,20 @@ export function MessageList() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
                 <p className="font-medium truncate">{conversation.name}</p>
-                <p className="text-xs text-muted-foreground">{conversation.time}</p>
+                <p className="text-xs text-muted-foreground">
+                  {conversation.createdAt}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground truncate">{conversation.message}</p>
+              <p className="text-sm text-muted-foreground truncate">
+                {conversation.message}
+              </p>
             </div>
-            {conversation.unread && <div className="h-2 w-2 rounded-full bg-primary"></div>}
+            {conversation.unread && (
+              <div className="h-2 w-2 rounded-full bg-primary"></div>
+            )}
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

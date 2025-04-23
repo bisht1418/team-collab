@@ -1,28 +1,47 @@
 "use client"
 
 import { configureStore } from "@reduxjs/toolkit"
-import { persistStore, persistReducer } from "redux-persist"
+import { 
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import { combineReducers } from "redux"
 import authReducer from "./features/authSlice"
+import chatReducer from "./features/chatSlice"
 
-const persistConfig = {
-  key: "root",
+// Configure persist for auth
+const authPersistConfig = {
+  key: "auth",
   storage,
-  whitelist: ["auth"], 
+  whitelist: ["user", "token", "refreshToken", "isAuthenticated"], // Only persist these properties
 }
 
-const rootReducer = combineReducers({
-  auth: authReducer,
-})
+// Configure persist for chat
+const chatPersistConfig = {
+  key: "chat",
+  storage,
+  whitelist: ["chats", "userStatuses"], // Only persist essential chat data
+}
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer)
+const persistedChatReducer = persistReducer(chatPersistConfig, chatReducer)
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: {
+    auth: persistedAuthReducer,
+    chat: persistedChatReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
     }),
 })
 
