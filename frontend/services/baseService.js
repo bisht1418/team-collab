@@ -3,22 +3,22 @@ import { store } from "../redux/store";
 import { clearAuth, setrefreshToken } from "../redux/features/authSlice";
 const BASE_URL = `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/api`;
 
-console.log("BASE_URL", BASE_URL)
+console.log("BASE_URL", BASE_URL);
 
 const baseService = axios.create({
     baseURL: BASE_URL,
     withCredentials: false,
+
     headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        "Content-Type": "application/json"
     },
 });
+
 const refreshTokenService = axios.create({
     baseURL: BASE_URL,
     withCredentials: false,
     headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        "Content-Type": "application/json"
     },
 });
 
@@ -56,4 +56,5 @@ baseService.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 export default baseService;
