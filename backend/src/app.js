@@ -10,7 +10,7 @@ const { errorConverter, errorHandler } = require('./middlewares/error.middleware
 
 
 const app = express();
-const server = http.createServer(app); 
+const server = http.createServer(app);
 
 app.use(helmet());
 app.use(express.json());
@@ -38,4 +38,4 @@ app.use((req, res) => {
 app.use(errorConverter);
 app.use(errorHandler);
 
-module.exports = { app, server };
+module.exports = { server };
