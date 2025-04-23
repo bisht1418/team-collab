@@ -10,7 +10,7 @@ const { errorConverter, errorHandler } = require('./middlewares/error.middleware
 const app = express();
 
 const corsOptions = {
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     const allowedOrigins = [
       'https://team-collab-7mfw.vercel.app',
       'http://localhost:3001',
@@ -23,7 +23,14 @@ const corsOptions = {
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Access-Control-Allow-Methods',  
+    'Access-Control-Allow-Headers',  
+    'Access-Control-Allow-Origin'    
+  ]
 };
 
 app.use(cors(corsOptions));
