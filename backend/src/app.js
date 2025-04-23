@@ -15,7 +15,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(xss());
 app.use(mongoSanitize());
 app.use(cors({
-  origin: '*',
+  origin: true,
+  credentials: true,
 }));
 app.options('*', cors());
 app.use(compression());
