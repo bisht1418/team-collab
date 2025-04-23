@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
+    "@reduxjs/toolkit": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -23,17 +24,17 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.54.1",
+    "react-redux": "latest",
     "react-resizable-panels": "^2.1.7",
+    "react-toastify": "^11.0.5",
     "recharts": "2.15.0",
+    "redux": "latest",
+    "redux-persist": "latest",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^3.24.1",
-    "redux": "latest",
-    "react-redux": "latest",
-    "redux-persist": "latest",
-    "@reduxjs/toolkit": "latest"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^18",

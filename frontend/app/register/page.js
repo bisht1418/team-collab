@@ -7,6 +7,7 @@ import Image from "next/image"
 import { useDispatch, useSelector } from "react-redux"
 import { register } from "../../redux/features/authSlice"
 import { Eye, EyeOff, AlertCircle, CheckCircle, User, Mail, Key } from "lucide-react"
+import authService from "services/authService"
 
 export default function Register() {
   const [name, setName] = useState("")
@@ -52,26 +53,11 @@ export default function Register() {
 
     try {
       setIsLoading(true)
-
-      // This is where you would normally make an API call
-      // For now, we'll simulate registration with dummy data
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      dispatch(
-        register({
-          user: {
-            id: Date.now().toString(),
-            name,
-            email,
-            avatar: "/placeholder.svg?height=40&width=40",
-          },
-          token: `dummy-token-${Date.now()}`,
-        }),
-      )
-
-      router.push("/dashboard")
+      const userData = { name, email, password }
+      const responseData = await authService.register(userData)
+      if (responseData?.success) {
+        router.push("/login")
+      }
     } catch (err) {
       setError("An error occurred. Please try again.")
       console.error(err)

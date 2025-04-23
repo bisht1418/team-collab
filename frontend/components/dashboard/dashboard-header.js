@@ -17,11 +17,11 @@ export default function DashboardHeader() {
   const { user } = useSelector((state) => state.auth)
 
   const handleLogout = () => {
-    dispatch(logout())
-    router.push("/login")
-  }
+    sessionStorage.setItem("loggedOut", "true");
+    dispatch(logout());
+    router.push("/");
+  };
 
-  // Dummy notifications
   const notifications = [
     {
       id: "1",
@@ -47,19 +47,12 @@ export default function DashboardHeader() {
   ]
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white shadow-sm bg-[#ededff]">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-indigo-600">
-                TeamSync
-              </Link>
-            </div>
-          </div>
+        <div className="">
+          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4 flex justify-between h-16">
 
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            <div className="relative">
+            <div className="relative ">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
@@ -69,8 +62,9 @@ export default function DashboardHeader() {
                 placeholder="Search..."
               />
             </div>
+            
+            <div className="relative flex gap-6">
 
-            <div className="relative">
               <button
                 className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 relative"
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -81,7 +75,7 @@ export default function DashboardHeader() {
               </button>
 
               {showNotifications && (
-                <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                <div className="origin-top-right absolute right-0 mt-10 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                   <div className="py-2 px-4 border-b">
                     <h3 className="text-sm font-medium">Notifications</h3>
                   </div>
@@ -104,9 +98,7 @@ export default function DashboardHeader() {
                   </div>
                 </div>
               )}
-            </div>
 
-            <div className="relative">
               <button
                 className="flex items-center space-x-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-md p-1"
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -121,7 +113,7 @@ export default function DashboardHeader() {
               </button>
 
               {showUserMenu && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                <div className="origin-top-right absolute right-0 mt-12 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                   <div className="py-1">
                     <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                       <User className="h-4 w-4 mr-2" /> Profile

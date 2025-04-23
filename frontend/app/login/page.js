@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux"
 import { login } from "../../redux/features/authSlice"
 import { Eye, EyeOff, AlertCircle, ArrowRight } from "lucide-react"
 import Image from "next/image"
+import authService from "services/authService"
+import { toast, ToastContainer } from "react-toastify"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -36,26 +38,12 @@ export default function Login() {
 
     try {
       setIsLoading(true)
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Demo credentials for testing
-      if (email === "demo@example.com" && password === "password") {
-        dispatch(
-          login({
-            user: {
-              id: "1",
-              name: "Demo User",
-              email: "demo@example.com",
-              avatar: "/placeholder.svg?height=40&width=40",
-            },
-            token: "dummy-token-12345",
-          }),
-        )
+      const responseData = await authService?.login({ email, password })
+      if (responseData?.success) {
+        toast.success(responseData?.message)
         router.push("/dashboard")
       } else {
-        setError("Invalid email or password")
+        toast.error(responseData?.message)
       }
     } catch (err) {
       setError("An error occurred. Please try again.")
@@ -67,6 +55,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen">
+      <ToastContainer />
       {/* Left side - Login Form */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100 opacity-0"></div>

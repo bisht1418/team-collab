@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit"
 const initialState = {
   user: null,
   token: null,
+  refreshToken: null,  
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -16,7 +17,8 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.user = action.payload.user
-      state.token = action.payload.token
+      state.token = action.payload.tokens.access.token
+      state.refreshToken = action.payload.tokens.refresh.token 
       state.isAuthenticated = true
       state.isLoading = false
       state.error = null
@@ -24,6 +26,7 @@ const authSlice = createSlice({
     register: (state, action) => {
       state.user = action.payload.user
       state.token = action.payload.token
+      state.refreshToken = action.payload.refreshToken 
       state.isAuthenticated = true
       state.isLoading = false
       state.error = null
@@ -31,6 +34,19 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null
       state.token = null
+      state.refreshToken = null
+      state.isAuthenticated = false
+      state.isLoading = false
+      state.error = null
+    },
+    setrefreshToken: (state, action) => {
+      state.token = action.payload.tokens.access.token
+      state.refreshToken = action.payload.tokens.refresh.token  || state.refreshToken
+    },
+    clearAuth: (state) => {
+      state.user = null
+      state.token = null
+      state.refreshToken = null
       state.isAuthenticated = false
       state.isLoading = false
       state.error = null
@@ -45,6 +61,14 @@ const authSlice = createSlice({
   },
 })
 
-export const { login, register, logout, setLoading, setError } = authSlice.actions
+export const { 
+  login, 
+  register, 
+  logout, 
+  setLoading, 
+  setError, 
+  setrefreshToken, 
+  clearAuth 
+} = authSlice.actions
 
 export default authSlice.reducer

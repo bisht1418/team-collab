@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSelector } from "react-redux"
-import DashboardSidebar from "../..//components/dashboard/dashboard-sidebar"
+import DashboardSidebar from "../../components/dashboard/dashboard-sidebar"
 import DashboardHeader from "../../components/dashboard/dashboard-header"
 
 export default function DashboardLayout({ children }) {
@@ -11,10 +11,15 @@ export default function DashboardLayout({ children }) {
   const { isAuthenticated, isLoading } = useSelector((state) => state.auth)
 
   useEffect(() => {
+    const isLoggedOut = sessionStorage.getItem("loggedOut");
+
     if (!isLoading && !isAuthenticated) {
-      router.push("/login")
+      if (!isLoggedOut) {
+        router.push("/login");
+      }
+      sessionStorage.removeItem("loggedOut"); // clean up
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -29,11 +34,11 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
-      <div className="flex">
-        <DashboardSidebar />
-        <main className="flex-1 p-6">{children}</main>
+    <div className="flex h-screen">
+      <DashboardSidebar />
+      <div className="flex flex-col flex-1">
+        <DashboardHeader />
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   )
