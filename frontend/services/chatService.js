@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import {
   fetchChatsSuccess,
   setActiveChat,
+  setMessages,
   addMessage,
   updateMessage,
   setTyping,
@@ -15,7 +16,7 @@ import {
   markMessageRead,
 } from "../redux/features/chatSlice";
 
-let socket;
+export let socket;
 const initializeSocket = (token) => {
   if (socket) return socket;
 
@@ -118,18 +119,26 @@ const chatService = {
       }
 
       store.dispatch(setActiveChat(chat));
+
+      // Fetch messages for this chat right after accessing it
+      await chatService.fetchMessages(chat._id, token);
+
       return { success: true, chat };
     } catch (error) {
       return handleError(error);
     }
   },
 
-  createGroupChat: async (name, users) => {
+  createGroupChat: async (name, users, token) => {
     try {
       store.dispatch(setLoading(true));
       const response = await baseService.post("/chats/group", {
         name,
         users: JSON.stringify(users),
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
 
       if (socket) {
@@ -142,11 +151,15 @@ const chatService = {
     }
   },
 
-  renameGroup: async (chatId, chatName) => {
+  renameGroup: async (chatId, chatName, token) => {
     try {
       const response = await baseService.put("/chats/rename", {
         chatId,
         chatName,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return { success: true, chat: response.data };
     } catch (error) {
@@ -154,11 +167,15 @@ const chatService = {
     }
   },
 
-  addToGroup: async (chatId, userId) => {
+  addToGroup: async (chatId, userId, token) => {
     try {
       const response = await baseService.put("/chats/groupadd", {
         chatId,
         userId,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return { success: true, chat: response.data };
     } catch (error) {
@@ -166,11 +183,15 @@ const chatService = {
     }
   },
 
-  removeFromGroup: async (chatId, userId) => {
+  removeFromGroup: async (chatId, userId, token) => {
     try {
       const response = await baseService.put("/chats/groupremove", {
         chatId,
         userId,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return { success: true, chat: response.data };
     } catch (error) {
@@ -183,9 +204,9 @@ const chatService = {
       const response = await baseService.post("/messages", {
         content,
         chatId,
-      },{
-        headers : {
-          Authorization : `Bearer ${token}`
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -199,19 +220,31 @@ const chatService = {
     }
   },
 
-  fetchMessages: async (chatId) => {
+  fetchMessages: async (chatId, token) => {
     try {
       store.dispatch(setLoading(true));
-      const response = await baseService.get(`/messages/${chatId}`);
+      const response = await baseService.get(`/messages/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Dispatch messages to Redux store
+      store.dispatch(setMessages(response.data));
+
       return { success: true, messages: response.data };
     } catch (error) {
       return handleError(error);
     }
   },
 
-  markAsRead: async (messageId) => {
+  markAsRead: async (messageId, token) => {
     try {
-      await baseService.put(`/messages/${messageId}/read`);
+      await baseService.put(`/messages/${messageId}/read`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
       const { activeChat } = store.getState().chat;
 
@@ -225,9 +258,13 @@ const chatService = {
     }
   },
 
-  deleteMessage: async (messageId) => {
+  deleteMessage: async (messageId, token) => {
     try {
-      await baseService.delete(`/messages/${messageId}`);
+      await baseService.delete(`/messages/${messageId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       return { success: true };
     } catch (error) {
       return handleError(error);

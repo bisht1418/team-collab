@@ -7,7 +7,7 @@ const initialState = {
   activeChat: null,
   messages: [],
   isTyping: false,
-  userStatuses: {}, // { userId: 'online' | 'offline' }
+  userStatuses: {}, 
   isLoading: false,
   error: null,
 }
@@ -39,15 +39,11 @@ const chatSlice = createSlice({
       state.isLoading = false
     },
     addMessage: (state, action) => {
-      // Add new message to messages array
       state.messages.push(action.payload)
-      
-      // Update the latestMessage in the corresponding chat
+
       const chatIndex = state.chats.findIndex(c => c._id === action.payload.chat._id)
       if (chatIndex !== -1) {
         state.chats[chatIndex].latestMessage = action.payload
-        
-        // Move this chat to the top of the list
         const updatedChat = state.chats[chatIndex]
         state.chats.splice(chatIndex, 1)
         state.chats.unshift(updatedChat)
@@ -57,9 +53,9 @@ const chatSlice = createSlice({
       const { messageId, updates } = action.payload
       const messageIndex = state.messages.findIndex(m => m._id === messageId)
       if (messageIndex !== -1) {
-        state.messages[messageIndex] = { 
-          ...state.messages[messageIndex], 
-          ...updates 
+        state.messages[messageIndex] = {
+          ...state.messages[messageIndex],
+          ...updates
         }
       }
     },
@@ -90,15 +86,12 @@ const chatSlice = createSlice({
       state.userStatuses[userId] = status
     },
     addChat: (state, action) => {
-      // Add new chat to the beginning of the array
       state.chats.unshift(action.payload)
     },
     updateChat: (state, action) => {
       const chatIndex = state.chats.findIndex(c => c._id === action.payload._id)
       if (chatIndex !== -1) {
         state.chats[chatIndex] = action.payload
-        
-        // If this is the active chat, update it too
         if (state.activeChat && state.activeChat._id === action.payload._id) {
           state.activeChat = action.payload
         }

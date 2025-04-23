@@ -17,6 +17,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import chatService from "../../services/chatService";
 import { format } from "date-fns";
+import  {addMessage}  from "../../redux/features/chatSlice";
 
 export function MessageView() {
   const token = useSelector((state) => state.auth.token);
@@ -44,12 +45,9 @@ export function MessageView() {
   }, [messages]);
 
   useEffect(() => {
-    // Set group name when active chat changes
     if (activeChat?.isGroupChat) {
       setNewGroupName(activeChat.chatName);
     }
-
-    // Clear typing indicator when changing chats
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
@@ -57,16 +55,15 @@ export function MessageView() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && activeChat) {
-      // Clear typing indicator
       chatService.sendStopTyping(activeChat._id);
 
-      // Send message
       const result = await chatService.sendMessage(
         newMessage.trim(),
         activeChat._id,
         token
       );
       if (result.success) {
+        dispatch(addMessage(result.message));
         setNewMessage("");
       }
     }
@@ -85,7 +82,6 @@ export function MessageView() {
       chatService.sendTyping(activeChat._id);
     }
 
-    // Reset typing timeout
     if (typingTimeout) clearTimeout(typingTimeout);
 
     const timeout = setTimeout(() => {
@@ -109,7 +105,6 @@ export function MessageView() {
     }
   };
 
-  // Get chat name and avatar
   const getChatInfo = () => {
     if (!activeChat) return { name: "", avatar: "" };
 
@@ -137,7 +132,6 @@ export function MessageView() {
     }
   };
 
-  // Group messages by date
   const groupMessagesByDate = () => {
     const groups = {};
 
@@ -158,7 +152,6 @@ export function MessageView() {
   const chatInfo = getChatInfo();
   const messageGroups = groupMessagesByDate();
 
-  // If no active chat is selected
   if (!activeChat) {
     return (
       <div className="flex flex-col flex-1 bg-white border-l items-center justify-center">

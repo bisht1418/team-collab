@@ -1,7 +1,9 @@
 import axios from "axios";
 import { store } from "../redux/store";
 import { clearAuth, setrefreshToken } from "../redux/features/authSlice";
-const BASE_URL = `http://localhost:3000/api`;
+const BASE_URL = `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/api`;
+
+console.log("BASE_URL", BASE_URL)
 
 const baseService = axios.create({
     baseURL: BASE_URL,
