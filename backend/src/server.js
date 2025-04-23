@@ -7,14 +7,15 @@ const port = PORT || 3000;
 
 const server = http.createServer(app);
 
-// Socket.IO Setup
 const socketInit = require('./socket/socket');
 const chatHandler = require('./socket/chatHandler');
 const io = socketInit.init(server);
 io.on('connection', chatHandler);
 
-// Mongo Connect + Server Listen
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 15000, 
+  socketTimeoutMS: 45000,
+})
   .then(() => {
     console.log(`✅ MongoDB connected`);
     server.listen(port, () => {
