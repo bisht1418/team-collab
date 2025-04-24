@@ -13,8 +13,11 @@ const io = socketInit.init(server);
 io.on('connection', chatHandler);
 
 mongoose.connect(MONGODB_URI, {
-  serverSelectionTimeoutMS: 15000, 
+  bufferCommands: false,
+  serverSelectionTimeoutMS: 20000,
   socketTimeoutMS: 45000,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
   .then(() => {
     console.log(`✅ MongoDB connected`);
