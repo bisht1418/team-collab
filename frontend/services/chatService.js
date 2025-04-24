@@ -20,7 +20,7 @@ export let socket;
 const initializeSocket = (token) => {
   if (socket) return socket;
 
-  socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000", {
+  socket = io(process.env.NEXT_PUBLIC_API_URL || "https://team-collab-1.onrender.com", {
     auth: { token },
   });
 

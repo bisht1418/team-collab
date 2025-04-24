@@ -1,7 +1,7 @@
 import axios from "axios";
 import { store } from "../redux/store";
 import { clearAuth, setrefreshToken } from "../redux/features/authSlice";
-const BASE_URL = `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/api`;
+const BASE_URL = `${process.env.NEXT_PUBLIC_SERVER_URL || "https://team-collab-1.onrender.com"}/api`;
 
 console.log("BASE_URL", BASE_URL);
 
